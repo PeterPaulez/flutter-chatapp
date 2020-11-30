@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
+      initialRoute: 'chat',
       routes: {
         'usuarios': (_) => UsuariosPage(),
         'chat': (_) => ChatPage(),
@@ -20,7 +21,6 @@ class MyApp extends StatelessWidget {
         'register': (_) => RegisterPage(),
         'loading': (_) => LoadingPage(),
       },
-      initialRoute: 'login',
     );
   }
 }
