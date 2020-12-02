@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Material App',
-        initialRoute: 'register',
+        initialRoute: 'loading',
         routes: {
           'usuarios': (_) => UsuariosPage(),
           'chat': (_) => ChatPage(),

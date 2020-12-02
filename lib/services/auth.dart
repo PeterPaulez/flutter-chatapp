@@ -46,7 +46,6 @@ class AuthService with ChangeNotifier {
       headers: {'Content-type': 'application/json'},
     );
 
-    print(answer.body);
     this.autenticando = false;
     if (answer.statusCode == 200) {
       final loginResponse = loginResponseFromJson(answer.body);
@@ -75,7 +74,6 @@ class AuthService with ChangeNotifier {
       headers: {'Content-type': 'application/json'},
     );
 
-    print(answer.body);
     this.autenticando = false;
     if (answer.statusCode == 200) {
       final loginResponse = loginResponseFromJson(answer.body);
@@ -87,6 +85,28 @@ class AuthService with ChangeNotifier {
       Map bodyResponse = jsonDecode(answer.body);
       this.msg =
           (bodyResponse['msg'] == null) ? 'No answer' : bodyResponse['msg'];
+      return false;
+    }
+  }
+
+  Future<bool> isLoggedIn() async {
+    final token = await this._storage.read(key: 'token');
+    final answer = await http.get(
+      '${Environment.apiURL}/usuario/renew',
+      headers: {
+        'Content-type': 'application/json',
+        'x-token': token,
+      },
+    );
+
+    if (answer.statusCode == 200) {
+      final loginResponse = loginResponseFromJson(answer.body);
+      this.usuario = loginResponse.usuario;
+      print('Usuario UID: ${this.usuario.uid}');
+      await this._guardarToken(loginResponse.token);
+      return true;
+    } else {
+      this.logout();
       return false;
     }
   }
