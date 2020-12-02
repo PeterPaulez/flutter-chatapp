@@ -34,6 +34,7 @@ class AuthService with ChangeNotifier {
   }
 
   Future<bool> login(String email, String password) async {
+    this.autenticando = true;
     final data = {
       'email': email,
       'password': password,
@@ -60,6 +61,32 @@ class AuthService with ChangeNotifier {
       */
       Map bodyResponse = jsonDecode(answer.body);
       this.msg = bodyResponse['msg'];
+      return false;
+    }
+  }
+
+  Future<bool> register(String email, String password, String nombre) async {
+    this.autenticando = true;
+    final data = {'email': email, 'password': password, 'nombre': nombre};
+
+    final answer = await http.post(
+      '${Environment.apiURL}/usuario/new',
+      body: jsonEncode(data),
+      headers: {'Content-type': 'application/json'},
+    );
+
+    print(answer.body);
+    this.autenticando = false;
+    if (answer.statusCode == 200) {
+      final loginResponse = loginResponseFromJson(answer.body);
+      this.usuario = loginResponse.usuario;
+      print('Usuario UID: ${this.usuario.uid}');
+      await this._guardarToken(loginResponse.token);
+      return true;
+    } else {
+      Map bodyResponse = jsonDecode(answer.body);
+      this.msg =
+          (bodyResponse['msg'] == null) ? 'No answer' : bodyResponse['msg'];
       return false;
     }
   }

@@ -1,8 +1,11 @@
+import 'package:chatapp/services/auth.dart';
+import 'package:chatapp/utils/mostrarAlertas.dart';
 import 'package:chatapp/widgets/boton_form.dart';
 import 'package:chatapp/widgets/custom_input.dart';
 import 'package:chatapp/widgets/footer.dart';
 import 'package:chatapp/widgets/header.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -52,6 +55,7 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -75,17 +79,32 @@ class __FormState extends State<_Form> {
             isPassword: true,
           ),
           BotonAzul(
-            placeHolder: 'Registrar',
+            placeHolder: 'Crear cuenta',
             printData: {
               'emailController': emailController.text,
               'passwordController': passwordController.text,
               'nameController': nameController.text
             },
-            onPressed: () {
-              print('Email: ${emailController.text}');
-              print('Pass: ${passwordController.text}');
-              print('Name: ${nameController.text}');
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    // Quitamos el foco este donde este y el teclado
+                    FocusScope.of(context).unfocus();
+                    final registerOK = await authService.register(
+                      emailController.text.trim(),
+                      passwordController.text.trim(),
+                      nameController.text.trim(),
+                    );
+
+                    if (registerOK) {
+                      // TODO: conectar con socket service, mandando credenciales
+                      // Esto lo hacemos para que no puedan volver atrás al LoginPage
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      mostrarAlertaForm(
+                          context, 'Fallo en el Registro', authService.msg);
+                    }
+                  },
           ),
         ],
       ),
