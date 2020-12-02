@@ -35,22 +35,18 @@ class AuthService with ChangeNotifier {
 
   Future<bool> login(String email, String password) async {
     this.autenticando = true;
-    final data = {
-      'email': email,
-      'password': password,
-    };
-
-    final answer = await http.post(
-      '${Environment.apiURL}/usuario/login',
-      body: jsonEncode(data),
-      headers: {'Content-type': 'application/json'},
+    final answer = await doRequest(
+      '/usuario/login',
+      {'email': email, 'password': password},
+      {'Content-type': 'application/json'},
+      'post',
     );
 
+    if (answer != null) print('BODY: ${answer.body}');
     this.autenticando = false;
-    if (answer.statusCode == 200) {
+    if (answer != null && answer.statusCode == 200) {
       final loginResponse = loginResponseFromJson(answer.body);
       this.usuario = loginResponse.usuario;
-      print('Usuario UID: ${this.usuario.uid}');
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
@@ -58,48 +54,81 @@ class AuthService with ChangeNotifier {
       FIXME
       Esto es feo que te cagas, perooooooo por fin leo bien una respuesta en oldSchool
       */
-      Map bodyResponse = jsonDecode(answer.body);
-      this.msg = bodyResponse['msg'];
+      if (answer != null) {
+        Map bodyResponse = jsonDecode(answer.body);
+        String msgerror;
+        this.msg = (bodyResponse.containsKey('msg'))
+            ? bodyResponse['msg']
+            : 'No answer';
+        // Gestión de los errores y pintado en el DIALOG
+        if (bodyResponse.containsKey('errors')) {
+          bodyResponse['errors'].forEach((key, value) {
+            if (msgerror == null) {
+              msgerror = bodyResponse['errors'][key]['msg'];
+            } else {
+              msgerror = msgerror + '\n' + bodyResponse['errors'][key]['msg'];
+            }
+          });
+        }
+        if (msgerror != null) this.msg = msgerror;
+      } else {
+        this.msg = 'Server Down';
+      }
       return false;
     }
   }
 
   Future<bool> register(String email, String password, String nombre) async {
     this.autenticando = true;
-    final data = {'email': email, 'password': password, 'nombre': nombre};
-
-    final answer = await http.post(
-      '${Environment.apiURL}/usuario/new',
-      body: jsonEncode(data),
-      headers: {'Content-type': 'application/json'},
+    final answer = await doRequest(
+      '/usuario/new',
+      {'email': email, 'password': password, 'nombre': nombre},
+      {'Content-type': 'application/json'},
+      'post',
     );
 
+    if (answer != null) print('BODY: ${answer.body}');
     this.autenticando = false;
-    if (answer.statusCode == 200) {
+    if (answer != null && answer.statusCode == 200) {
       final loginResponse = loginResponseFromJson(answer.body);
       this.usuario = loginResponse.usuario;
-      print('Usuario UID: ${this.usuario.uid}');
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
-      Map bodyResponse = jsonDecode(answer.body);
-      this.msg =
-          (bodyResponse['msg'] == null) ? 'No answer' : bodyResponse['msg'];
+      if (answer != null) {
+        Map bodyResponse = jsonDecode(answer.body);
+        String msgerror;
+        this.msg = (bodyResponse.containsKey('msg'))
+            ? bodyResponse['msg']
+            : 'No answer';
+        // Gestión de los errores y pintado en el DIALOG
+        if (bodyResponse.containsKey('errors')) {
+          bodyResponse['errors'].forEach((key, value) {
+            if (msgerror == null) {
+              msgerror = bodyResponse['errors'][key]['msg'];
+            } else {
+              msgerror = msgerror + '\n' + bodyResponse['errors'][key]['msg'];
+            }
+          });
+        }
+        if (msgerror != null) this.msg = msgerror;
+      } else {
+        this.msg = 'Server Down';
+      }
       return false;
     }
   }
 
   Future<bool> isLoggedIn() async {
     final token = await this._storage.read(key: 'token');
-    final answer = await http.get(
-      '${Environment.apiURL}/usuario/renew',
-      headers: {
-        'Content-type': 'application/json',
-        'x-token': token,
-      },
+    final answer = await doRequest(
+      '/usuario/renew',
+      null,
+      {'Content-type': 'application/json', 'x-token': token},
+      'get',
     );
 
-    if (answer.statusCode == 200) {
+    if (answer != null && answer.statusCode == 200) {
       final loginResponse = loginResponseFromJson(answer.body);
       this.usuario = loginResponse.usuario;
       print('Usuario UID: ${this.usuario.uid}');
@@ -108,6 +137,29 @@ class AuthService with ChangeNotifier {
     } else {
       this.logout();
       return false;
+    }
+  }
+
+  Future doRequest(
+      String url, data, Map<String, String> headers, String method) async {
+    try {
+      if (method == 'get') {
+        final answer = await http.get(
+          '${Environment.apiURL}$url',
+          headers: headers,
+        );
+        return answer;
+      } else {
+        final answer = await http.post(
+          '${Environment.apiURL}$url',
+          body: jsonEncode(data),
+          headers: headers,
+        );
+        return answer;
+      }
+    } catch (e) {
+      print('Error => $e');
+      return;
     }
   }
 
