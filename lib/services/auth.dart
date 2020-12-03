@@ -50,10 +50,6 @@ class AuthService with ChangeNotifier {
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
-      /*
-      FIXME
-      Esto es feo que te cagas, perooooooo por fin leo bien una respuesta en oldSchool
-      */
       if (answer != null) {
         Map bodyResponse = jsonDecode(answer.body);
         String msgerror;

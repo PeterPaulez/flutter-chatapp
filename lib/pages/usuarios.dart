@@ -1,5 +1,6 @@
 import 'package:chatapp/models/usuario.dart';
 import 'package:chatapp/services/auth.dart';
+import 'package:chatapp/services/socket.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -22,8 +23,9 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final authService = Provider.of<AuthService>(context);
     final usuario = authService.usuario;
+    final socketService = Provider.of<SocketService>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -47,25 +49,18 @@ class _UsuariosPageState extends State<UsuariosPage> {
             color: Colors.black87,
           ),
           onPressed: () {
-            // TODO: Desconectador del socket server
             Navigator.pushReplacementNamed(context, 'login');
             AuthService.deleteToken();
+            socketService.disconnect();
           },
         ),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 10),
-            child: Icon(
-              Icons.check_circle,
-              color: Colors.green,
-            ),
-            /*
-            child: Icon(
-              Icons.offline_bolt,
-              color: Colors.red,
-            ),
-            */
-          )
+            child: (socketService.serverStatus == ServerStatus.Online)
+                ? Icon(Icons.check_circle, color: Colors.green)
+                : Icon(Icons.offline_bolt, color: Colors.red),
+          ),
         ],
       ),
       body: SmartRefresher(

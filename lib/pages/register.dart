@@ -1,4 +1,5 @@
 import 'package:chatapp/services/auth.dart';
+import 'package:chatapp/services/socket.dart';
 import 'package:chatapp/utils/mostrarAlertas.dart';
 import 'package:chatapp/widgets/boton_form.dart';
 import 'package:chatapp/widgets/custom_input.dart';
@@ -56,6 +57,8 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -97,7 +100,7 @@ class __FormState extends State<_Form> {
                     );
 
                     if (registerOK) {
-                      // TODO: conectar con socket service, mandando credenciales
+                      socketService.connect();
                       // Esto lo hacemos para que no puedan volver atrás al LoginPage
                       Navigator.pushReplacementNamed(context, 'usuarios');
                     } else {
