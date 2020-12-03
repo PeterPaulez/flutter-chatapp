@@ -1,3 +1,4 @@
+import 'package:chatapp/services/auth.dart';
 import 'package:chatapp/utils/environment.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,8 @@ class SocketService with ChangeNotifier {
   // No quiero conectarme siempre
   */
 
-  void connect() {
+  void connect() async {
+    final token = await AuthService.getToken();
     // Dart client
     //final url = 'https://bandnames-backend.herokuapp.com/';
     // final url = 'http://localhost:3000';
@@ -33,7 +35,10 @@ class SocketService with ChangeNotifier {
       'transports': ['websocket'],
       'autoConnect': true,
       // Trataba de hacer la misma conexión anteriormente, de esta forma forzamos una nueva.
-      'forceNew': true
+      'forceNew': true,
+      'extraHeaders': {
+        'x-token': token,
+      }
     });
 
     this._socket.on('connect', (_) {
