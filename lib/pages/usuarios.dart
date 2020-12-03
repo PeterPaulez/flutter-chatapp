@@ -116,7 +116,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
   }
 
   _cargarUsuarios() async {
-    this.usuarios = await chatService.getUsuarios();
+    this.usuarios = await chatService.getUsuarios(context);
     setState(() {});
     //await Future.delayed(Duration(milliseconds: 500));
     // if failed,use refreshFailed()
