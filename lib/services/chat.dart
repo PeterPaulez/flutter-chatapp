@@ -6,7 +6,9 @@ import 'package:chatapp/utils/mostrarAlertas.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class ChatService {
+class ChatService with ChangeNotifier {
+  Usuario usuarioChat;
+
   Future<List<Usuario>> getUsuarios(BuildContext context) async {
     try {
       final answer = await http.get(

@@ -94,23 +94,24 @@ class _UsuariosPageState extends State<UsuariosPage> {
         itemCount: usuarios.length);
   }
 
-  ListTile _usuarioListTile(Usuario usuario) {
+  ListTile _usuarioListTile(Usuario usuarioCHAT) {
     return ListTile(
-      title: Text(usuario.nombre),
-      subtitle: Text(usuario.email),
+      title: Text(usuarioCHAT.nombre),
+      subtitle: Text(usuarioCHAT.email),
       leading: CircleAvatar(
-        child: Text(usuario.nombre.substring(0, 2)),
+        child: Text(usuarioCHAT.nombre.substring(0, 2)),
         backgroundColor: Colors.blue[100],
       ),
       onTap: () {
-        print(usuario.uid);
+        Navigator.pushNamed(context, 'chat', arguments: usuarioCHAT);
+        print(usuarioCHAT.uid);
       },
       trailing: Container(
         width: 10,
         height: 10,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
-            color: (usuario.online) ? Colors.green : Colors.red),
+            color: (usuarioCHAT.online) ? Colors.green : Colors.red),
       ),
     );
   }
