@@ -103,7 +103,9 @@ class _UsuariosPageState extends State<UsuariosPage> {
         backgroundColor: Colors.blue[100],
       ),
       onTap: () {
-        Navigator.pushNamed(context, 'chat', arguments: usuarioCHAT);
+        final chatService = Provider.of<ChatService>(context, listen: false);
+        chatService.usuarioChat = usuarioCHAT;
+        Navigator.pushNamed(context, 'chat');
         print(usuarioCHAT.uid);
       },
       trailing: Container(

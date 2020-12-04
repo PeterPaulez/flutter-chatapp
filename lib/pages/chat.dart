@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chatapp/models/mensajes_response.dart';
 import 'package:chatapp/models/usuario.dart';
 import 'package:chatapp/services/auth.dart';
 import 'package:chatapp/services/chat.dart';
@@ -26,11 +27,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    super.initState();
     this.chatService = Provider.of<ChatService>(context, listen: false);
     this.socketService = Provider.of<SocketService>(context, listen: false);
     this.authService = Provider.of<AuthService>(context, listen: false);
     this.socketService.socket.on('mensaje-personal', _escucharMensajes);
-    super.initState();
+    _cargarHistorial();
   }
 
   void _escucharMensajes(dynamic payload) {
@@ -50,7 +52,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    this.usuarioChat = ModalRoute.of(context).settings.arguments;
+    this.usuarioChat = chatService.usuarioChat;
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
@@ -109,6 +111,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
               child: TextField(
                 controller: _textController,
                 onSubmitted: _handleSubmit,
+                textCapitalization: TextCapitalization.sentences,
                 onChanged: (String texto) {
                   setState(() {
                     if (texto.trim().length > 0)
@@ -163,7 +166,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     // Creamos el mensaje para meterlo en el ListTile como uno más
     // Lo hacemos con modelo y como widget de una tirada, 2 por el precio de 1
     final newMessage = new ChatMessage(
-      uid: '123',
+      uid: authService.usuario.uid,
       texto: texto,
       animationController: AnimationController(
         vsync: this,
@@ -190,5 +193,23 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
     this.socketService.socket.off('mensaje-personal');
     super.dispose();
+  }
+
+  _cargarHistorial() async {
+    List<Mensaje> chat = await this
+        .chatService
+        .getMensajes(context, chatService.usuarioChat.uid);
+    final history = chat.map((m) => new ChatMessage(
+          texto: m.mensaje,
+          uid: m.de,
+          animationController: AnimationController(
+            vsync: this,
+            duration: Duration(milliseconds: 400),
+          )..forward(),
+        ));
+
+    setState(() {
+      _messages.insertAll(0, history);
+    });
   }
 }

@@ -1,3 +1,4 @@
+import 'package:chatapp/models/mensajes_response.dart';
 import 'package:chatapp/models/usuario.dart';
 import 'package:chatapp/models/usuarios_response.dart';
 import 'package:chatapp/services/auth.dart';
@@ -14,12 +15,31 @@ class ChatService with ChangeNotifier {
       final answer = await http.get(
         '${Environment.apiURL}/chat/list',
         headers: {
-          'Content-type': 'application/json',
+          'Content-Type': 'application/json',
           'x-token': await AuthService.getToken(),
         },
       );
       final usuariosResponse = usuariosResponseFromJson(answer.body);
       return usuariosResponse.usuarios;
+    } catch (e) {
+      print('Server Down');
+      mostrarAlertaForm(context, 'Something goes wrong', 'Server is Down');
+      return [];
+    }
+  }
+
+  Future<List<Mensaje>> getMensajes(
+      BuildContext context, String usuarioID) async {
+    try {
+      final answer = await http.get(
+        '${Environment.apiURL}/chat/mensajes/$usuarioID',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': await AuthService.getToken(),
+        },
+      );
+      final mensajesResponse = mensajesResponseFromJson(answer.body);
+      return mensajesResponse.mensajes;
     } catch (e) {
       print('Server Down');
       mostrarAlertaForm(context, 'Something goes wrong', 'Server is Down');

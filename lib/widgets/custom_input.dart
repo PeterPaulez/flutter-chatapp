@@ -13,7 +13,7 @@ class CustomInput extends StatelessWidget {
     @required this.placeHolder,
     @required this.textController,
     this.keyboardType = TextInputType.text,
-    this.isPassword,
+    this.isPassword = false,
   }) : super(key: key);
 
   @override
@@ -35,7 +35,7 @@ class CustomInput extends StatelessWidget {
         controller: this.textController,
         autocorrect: false,
         keyboardType: this.keyboardType,
-        obscureText: false,
+        obscureText: this.isPassword,
         decoration: InputDecoration(
           prefixIcon: Icon(this.icon),
           focusedBorder: InputBorder.none,

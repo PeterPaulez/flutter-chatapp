@@ -1,4 +1,6 @@
+import 'package:chatapp/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
   final String texto;
@@ -14,6 +16,7 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
     // Vamos a meter animaciones básicas de flutter (TickerProviderStateMixin)
     return FadeTransition(
       opacity: animationController,
@@ -21,7 +24,9 @@ class ChatMessage extends StatelessWidget {
         sizeFactor:
             CurvedAnimation(parent: animationController, curve: Curves.easeOut),
         child: Container(
-          child: (this.uid == '123') ? _myMessage() : _notMyMessage(),
+          child: (this.uid == authService.usuario.uid)
+              ? _myMessage()
+              : _notMyMessage(),
         ),
       ),
     );
