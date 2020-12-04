@@ -6,6 +6,7 @@ class CustomInput extends StatelessWidget {
   final TextEditingController textController;
   final TextInputType keyboardType;
   final bool isPassword;
+  final TextCapitalization textCapitalization;
 
   const CustomInput({
     Key key,
@@ -14,6 +15,7 @@ class CustomInput extends StatelessWidget {
     @required this.textController,
     this.keyboardType = TextInputType.text,
     this.isPassword = false,
+    this.textCapitalization = TextCapitalization.none,
   }) : super(key: key);
 
   @override
@@ -36,6 +38,7 @@ class CustomInput extends StatelessWidget {
         autocorrect: false,
         keyboardType: this.keyboardType,
         obscureText: this.isPassword,
+        textCapitalization: this.textCapitalization,
         decoration: InputDecoration(
           prefixIcon: Icon(this.icon),
           focusedBorder: InputBorder.none,

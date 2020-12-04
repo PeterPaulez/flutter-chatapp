@@ -1,10 +1,9 @@
-import 'dart:io';
-
 class Environment {
-  static String apiURL = Platform.isAndroid
+  static bool test = false;
+  static String apiURL = test
       ? 'http://192.168.1.33:3000/api'
-      : 'http://192.168.1.33:3000/api';
-  static String socketURL = Platform.isAndroid
+      : 'https://chatappflutter-backend.herokuapp.com/api';
+  static String socketURL = test
       ? 'http://192.168.1.33:3000'
-      : 'http://192.168.1.33:3000';
+      : 'https://chatappflutter-backend.herokuapp.com';
 }

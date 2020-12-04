@@ -68,6 +68,7 @@ class __FormState extends State<_Form> {
             icon: Icons.perm_identity,
             placeHolder: 'Nombre',
             textController: nameController,
+            textCapitalization: TextCapitalization.sentences,
           ),
           CustomInput(
             icon: Icons.mail_outline,

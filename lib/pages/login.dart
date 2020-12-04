@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Header(titulo: 'Messenger'),
+                Header(titulo: 'Chat APP'),
                 _Form(),
                 Footer(
                   route: 'register',
